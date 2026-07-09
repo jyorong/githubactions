@@ -34,11 +34,11 @@ jobs:
 
       - name: Create Pull Request
         if: success()
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: main-dev
-          title: "Auto PR: main-dev → main"
-          body: |
-            This pull request was automatically created after the workflow completed successfully.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head main-dev \
+            --title "Auto PR: main-dev → main" \
+            --body "This pull request was automatically created after the workflow completed successfully."
