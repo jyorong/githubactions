@@ -1,25 +1,19 @@
-name: Auto Create PR and Merge on Success
+﻿name: Auto Push on Review and Test Success
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  create-pr:
+  build-test-review:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2
         with:
           node-version: '18'
 
@@ -29,21 +23,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Create Pull Request to main
+      - name: Run code review
+        # This is a placeholder - replace with your actual review tool (or team's) preferred review action
+        # For example: using eslint, reviewdog, or any linting/formatting checks
+        run: npm run lint
+
+      - name: Push successful changes
         if: success()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if PR already exists
-          PR_EXISTS=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number' || echo "")
-          
-          if [ -z "$PR_EXISTS" ]; then
-            gh pr create \
-              --base main \
-              --head "${{ github.ref_name }}" \
-              --title "Auto PR: ${{ github.ref_name }}" \
-              --body "Automatically created PR from branch ${{ github.ref_name }}"
-            echo "Created new PR"
-          else
-            echo "PR already exists: $PR_EXISTS"
-          fi
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git push origin HEAD:main
