@@ -1,4 +1,4 @@
-name: Auto Test & Merge PR
+name: Auto Test & Merge PR [main]
 
 on:
   pull_request:
