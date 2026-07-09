@@ -1,0 +1,36 @@
+name: Auto PR to main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run code review
+        # This is a placeholder - replace with your actual review tool (or team's) preferred review action
+        # For example: using eslint, reviewdog, or any linting/formatting checks
+        run: npm run lint
+
+      - name: Push successful changes
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git push origin HEAD:main
