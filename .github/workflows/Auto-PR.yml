@@ -3,7 +3,7 @@ name: Auto PR to main Branch
 on:
   push:
     branches:
-      - main
+      - main-dev
 
 jobs:
   build-test-review:
