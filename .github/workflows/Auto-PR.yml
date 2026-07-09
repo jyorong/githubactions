@@ -28,9 +28,9 @@ jobs:
         # For example: using eslint, reviewdog, or any linting/formatting checks
         run: npm run lint
 
-      - name: Push successful changes
-        if: success()
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git push origin HEAD:main
+- name: Push successful changes
+         if: success()
+         run: |
+           git config --global user.name 'github-actions[bot]'
+           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+           git push --force-with-lease origin HEAD:main
