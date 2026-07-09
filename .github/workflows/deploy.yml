@@ -32,7 +32,7 @@ jobs:
       - name: Create Pull Request to main
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
         run: |
           # Check if PR already exists
           PR_EXISTS=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number' || echo "")
