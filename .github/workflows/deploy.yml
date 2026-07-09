@@ -3,7 +3,7 @@ name: Auto Create PR and Merge on Success
 on:
   push:
     branches-ignore:
-      - main-dev
+      - main
 
 permissions:
   contents: write
