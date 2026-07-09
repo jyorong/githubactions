@@ -1,19 +1,25 @@
-﻿name: Auto Push on Review and Test Success
+name: Auto Create PR and Merge on Success
 
 on:
   push:
-    branches:
+    branches-ignore:
       - main
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  build-test-review:
+  create-pr:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -23,14 +29,21 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Run code review
-        # This is a placeholder - replace with your actual review tool (or team's) preferred review action
-        # For example: using eslint, reviewdog, or any linting/formatting checks
-        run: npm run lint
-
-      - name: Push successful changes
+      - name: Create Pull Request to main
         if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git push origin HEAD:main
+          # Check if PR already exists
+          PR_EXISTS=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number' || echo "")
+          
+          if [ -z "$PR_EXISTS" ]; then
+            gh pr create \
+              --base main \
+              --head "${{ github.ref_name }}" \
+              --title "Auto PR: ${{ github.ref_name }}" \
+              --body "Automatically created PR from branch ${{ github.ref_name }}"
+            echo "Created new PR"
+          else
+            echo "PR already exists: $PR_EXISTS"
+          fi
